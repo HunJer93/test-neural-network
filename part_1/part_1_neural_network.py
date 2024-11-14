@@ -6,6 +6,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import confusion_matrix, accuracy_score
 
 
 ###### START DATA PREPROCESSING ######
@@ -32,6 +33,7 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size= 0.2, random
 
 # feature scaling 
 sc = StandardScaler()
+# use fit_transform to set scaling, and then ONLY transform after that
 x_train = sc.fit_transform(x_train)
 x_test = sc.transform(x_test)
 
@@ -70,27 +72,25 @@ ann.fit(x_train, y_train, batch_size = 32, epochs = 100)
 
 ###### END OF TRAINING NETWORK ######
 
-# use the trained model to make predictions
+###### START OF USING NETWORK FOR PREDICTIONS ######
 
-test_user = {
-    'CreditScore': 600,
-    'Geography': 'France',
-    'Gender': "Male",
-    'Age': 40,
-    'Tenure': 3,
-    'Balance': 60000,
-    'NumOfProducts': 2,
-    'HasCrCard': 1,
-    'IsActiveMember': 1,
-    'EstimatedSalary': 50000
-}
+# use the trained model to make predictions (always use double brackets with predict method)
+# predict a user will stay or leave. Use transform when adding new values, and only use fit_transform for first value.
+single_prediction = ann.predict(sc.transform([[1, 0, 0, 600, 1, 40, 3, 60000, 2 , 1, 1, 50000]]))
 
-print(test_user)
+print("Will the customer leave the bank? (predicted) ", single_prediction > 0.5) # use 50/50 for leave (True) or stay (False)
 
-# clean user info (geography and gender)
-test_user['Gender'] = le.fit_transform(test_user['Gender'])
-test_user['Geography'] = np.array(ct.fit_transform([test_user['Geography']]))
+# predict the test results from our test data set
+y_pred = ann.predict(x_test)
+y_pred = (y_pred > 0.5)
+test_prediction = np.concatenate((y_pred.reshape(len(y_pred), 1), y_test.reshape(len(y_test), 1)), 1)
+print("test prediction vs actual prediction: ", test_prediction)
 
-print(test_user)
+###### END OF USING NETWORK FOR PREDICTIONS ######
 
-# ann.predict()
+###### START OF CONFUSION MATRIX ######
+# create confusion matrix to give percentage accuracy from neural network to actual results(test data)
+cm = confusion_matrix(y_test, y_pred)
+print("confusion matrix: ", cm)
+print("accuracy score: ", accuracy_score(y_test, y_pred))
+###### END OF CONFUSION MATRIX ######
