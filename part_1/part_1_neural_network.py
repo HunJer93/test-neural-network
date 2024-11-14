@@ -69,3 +69,28 @@ ann.compile(optimizer= 'adam', loss='binary_crossentropy' , metrics= ['accuracy'
 ann.fit(x_train, y_train, batch_size = 32, epochs = 100)
 
 ###### END OF TRAINING NETWORK ######
+
+# use the trained model to make predictions
+
+test_user = {
+    'CreditScore': 600,
+    'Geography': 'France',
+    'Gender': "Male",
+    'Age': 40,
+    'Tenure': 3,
+    'Balance': 60000,
+    'NumOfProducts': 2,
+    'HasCrCard': 1,
+    'IsActiveMember': 1,
+    'EstimatedSalary': 50000
+}
+
+print(test_user)
+
+# clean user info (geography and gender)
+test_user['Gender'] = le.fit_transform(test_user['Gender'])
+test_user['Geography'] = np.array(ct.fit_transform([test_user['Geography']]))
+
+print(test_user)
+
+# ann.predict()
