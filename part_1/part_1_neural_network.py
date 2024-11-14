@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 
-###### START DATA PREPROCESSING
+###### START DATA PREPROCESSING ######
 
 # import the dataset from CSV
 dataset = pd.read_csv('Churn_Modelling.csv')
@@ -35,4 +35,23 @@ sc = StandardScaler()
 x_train = sc.fit_transform(x_train)
 x_test = sc.transform(x_test)
 
-###### END DATA PREPROCESSING
+###### END DATA PREPROCESSING ######
+
+###### START OF A.N.N ######
+# instantiate a shallow neural network
+ann = tf.keras.models.Sequential()
+
+# create input layer and first hidden layer
+# When adding nodes to the network there is no rule of thumb, so try adding different #s of units going forward
+# using rectifier activation function with 'relu'
+ann.add(tf.keras.layers.Dense(units=6, activation='relu'))
+
+# create second hidden layer
+ann.add(tf.keras.layers.Dense(units=6, activation='relu'))
+
+# create output layer
+# using 1 unit for exited output. If we wanted more variables output, we would increase the units.
+# using sigmoid to predict binary output
+ann.add(tf.keras.layers.Dense(units=1, activation='sigmoid'))
+
+###### END OF A.N.N ######
