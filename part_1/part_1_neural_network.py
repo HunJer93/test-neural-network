@@ -51,7 +51,21 @@ ann.add(tf.keras.layers.Dense(units=6, activation='relu'))
 
 # create output layer
 # using 1 unit for exited output. If we wanted more variables output, we would increase the units.
-# using sigmoid to predict binary output
+# using sigmoid to predict binary output. We would use soft max for multiple variables output
 ann.add(tf.keras.layers.Dense(units=1, activation='sigmoid'))
 
 ###### END OF A.N.N ######
+
+###### START OF TRAINING NETWORK ######
+# compile the network for training
+# using stochastic gradient descent to update weights (adam)
+# since we want binary output, we need 'binary_crossentropy'. For non-binary use crossentropy
+# only tracking the accuracy metric, but we could add others to the array if we wanted more metrics
+ann.compile(optimizer= 'adam', loss='binary_crossentropy' , metrics= ['accuracy'])
+
+# train the ann on the training set
+# using batch size default of 32, and using batch training because it more accurately trains an ann but updating the weights in batches
+# epochs are the number of times the training runs. The higher the number, the greater the accuracy.
+ann.fit(x_train, y_train, batch_size = 32, epochs = 100)
+
+###### END OF TRAINING NETWORK ######
