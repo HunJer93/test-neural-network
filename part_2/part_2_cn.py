@@ -83,21 +83,34 @@ cnn.add(tf.keras.layers.MaxPool2D(
 ))
 
 
-##################
-# ADD FLATTENING LAYER
-##################
+# add flattening layer
 
 cnn.add(tf.keras.layers.Flatten())
 
 
-##################
-# CONNECT EVERYTHING TOGETHER
-##################
+# connect the layers together
 
 cnn.add(tf.keras.layers.Dense(units=128, activation='relu')) # adding larger number of neurons for accuracy and using rectifier function
 
-##################
-# CREATE OUTPUT LAYER
-##################
+# create the output layer
 
 cnn.add(tf.keras.layers.Dense(units=1, activation='sigmoid')) # using sigmoid for binary classification (multiclass would use softmax activation)
+
+
+##################
+# TRAIN THE CNN
+##################
+
+# compile the CNN
+cnn.compile(
+    optimizer='adam',
+    loss = 'binary_crossentropy',
+    metrics=['accuracy']
+)
+
+# train the CNN on the training set and use test set to validate
+cnn.fit(
+    x = training_set,
+    validation_data= test_set,
+    epochs=25 # number of times the network runs.
+)
