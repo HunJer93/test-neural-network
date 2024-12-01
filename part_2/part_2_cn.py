@@ -31,7 +31,7 @@ class_mode = 'binary' # could be binary or categorical (yes/no vs. multiple outc
 
 # this generator reads the pictures found in '/dataset/training_set', and generates batches to train our network.
 training_set = train_data_generator.flow_from_directory(
-    '/dataset/training_set', # target directory
+    'dataset/training_set', # target directory
     target_size= (image_size, image_size), # all images will be resized to 150 x 150 px
     batch_size= batch_size,
     class_mode= class_mode # used for binary_crossentropy loss
@@ -42,7 +42,7 @@ training_set = train_data_generator.flow_from_directory(
 
 test_data_generator = ImageDataGenerator(rescale=1./255)
 test_set = test_data_generator.flow_from_directory(
-    '/dataset/test_set',
+    'dataset/test_set',
     target_size=(image_size, image_size),
     batch_size=batch_size,
     class_mode=class_mode
