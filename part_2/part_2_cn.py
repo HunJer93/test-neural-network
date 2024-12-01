@@ -46,10 +46,6 @@ test_set = test_data_generator.flow_from_directory(
     class_mode=class_mode
 )
 
-##################
-# END DATA PRE-PROCESSING
-##################
-
 
 ##################
 # BUILD THE CNN
@@ -87,5 +83,21 @@ cnn.add(tf.keras.layers.MaxPool2D(
 ))
 
 
+##################
+# ADD FLATTENING LAYER
+##################
+
+cnn.add(tf.keras.layers.Flatten())
 
 
+##################
+# CONNECT EVERYTHING TOGETHER
+##################
+
+cnn.add(tf.keras.layers.Dense(units=128, activation='relu')) # adding larger number of neurons for accuracy and using rectifier function
+
+##################
+# CREATE OUTPUT LAYER
+##################
+
+cnn.add(tf.keras.layers.Dense(units=1, activation='sigmoid')) # using sigmoid for binary classification (multiclass would use softmax activation)
