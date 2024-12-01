@@ -121,24 +121,45 @@ cnn.fit(
 # USING CNN TO MAKE A PREDICTION
 ##################
 
-# load image from the single_prediction directory
-# resize using target_size used to make sure the images are the same size of the training set
-test_image = image.load_img('dataset/single_prediction/cat_or_dog_1.jpg', target_size= (image_size, image_size))
+# for giggles, request user input for image 
+from pathlib import Path
+user_input = ''
 
-# convert image into an array to compare 1:1 against CNN output
-test_image = image.img_to_array(test_image)
 
-# add extra dimention to make up for batch size (single image vs 32 images in training) so that the test_image can be input into the cnn model
-test_image = np.expand_dims(test_image, axis = 0)
-
-# output the result
-result = cnn.predict(test_image)
-
-# get indices from the training set (is 1/0 cat or dog?)
-training_set.class_indices
-if result[0][0] == 1: # use 0 index to access first batch (the only batch) and index 0 to access the prediction
-    prediction = 'It looks like a Dog'
-else:
-    prediction = 'It looks like a Cat'
+while user_input != 'q':
+    print('\nThe CNN has been trained! \n')
+    print('Enter the file path to see if the image is a cat or a dog')
+    print('You can also enter Q to quit\n')
     
-print(prediction)
+    user_input = input('Enter the file name here from the single_prediction directory (don\'t include the .jpg extension): ').lower()
+    
+    if user_input != 'q':
+        file_path = 'dataset/single_prediction/' + user_input + '.jpg'
+        print('searching for file ' + user_input + '.jpg ' + ' in ' + file_path + '\n')
+        if Path(file_path).is_file():
+            # load image from the single_prediction directory
+            # resize using target_size used to make sure the images are the same size of the training set
+            test_image = image.load_img(file_path, target_size= (image_size, image_size))
+
+            # convert image into an array to compare 1:1 against CNN output
+            test_image = image.img_to_array(test_image)
+
+            # add extra dimention to make up for batch size (single image vs 32 images in training) so that the test_image can be input into the cnn model
+            test_image = np.expand_dims(test_image, axis = 0)
+
+            # output the result
+            result = cnn.predict(test_image)
+
+            # get indices from the training set (is 1/0 cat or dog?)
+            training_set.class_indices
+            if result[0][0] == 1: # use 0 index to access first batch (the only batch) and index 0 to access the prediction
+                prediction = 'It looks like a Dog'
+            else:
+                prediction = 'It looks like a Cat'
+                
+            print(prediction)
+        else:
+            print('.jpg file was not found at ' + file_path)
+    
+    
+print('Exiting now. Goodbye!')
