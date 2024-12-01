@@ -1,6 +1,8 @@
 import tensorflow as tf
 # keras is used for image processing
 from keras.preprocessing.image import ImageDataGenerator
+from keras.preprocessing import image
+import numpy as np
 
 ####################
 # PRE-PROCESSING THE DATASET
@@ -114,3 +116,29 @@ cnn.fit(
     validation_data= test_set,
     epochs=25 # number of times the network runs.
 )
+
+##################
+# USING CNN TO MAKE A PREDICTION
+##################
+
+# load image from the single_prediction directory
+# resize using target_size used to make sure the images are the same size of the training set
+test_image = image.load_img('dataset/single_prediction/cat_or_dog_1.jpg', target_size= (image_size, image_size))
+
+# convert image into an array to compare 1:1 against CNN output
+test_image = image.img_to_array(test_image)
+
+# add extra dimention to make up for batch size (single image vs 32 images in training) so that the test_image can be input into the cnn model
+test_image = np.expand_dims(test_image, axis = 0)
+
+# output the result
+result = cnn.predict(test_image)
+
+# get indices from the training set (is 1/0 cat or dog?)
+training_set.class_indices
+if result[0][0] == 1: # use 0 index to access first batch (the only batch) and index 0 to access the prediction
+    prediction = 'It looks like a Dog'
+else:
+    prediction = 'It looks like a Cat'
+    
+print(prediction)
