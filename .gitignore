@@ -1,0 +1,5 @@
+# ignore image training sets due to size
+/part_2/dataset/*
+# ignore part 5 and 6 training sets
+/part_5/ml*
+/part_6/ml*
