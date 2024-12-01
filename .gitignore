@@ -1,2 +1,2 @@
 # ignore image training sets due to size
-part_2/dataset/
+/part_2/dataset/*
