@@ -11,6 +11,11 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers import Dropout
 
+# numpy version had to be downgraded to 1.18.5 in order to work with Keras
+# otherwise was throwing the following error:
+# NotImplementedError: Cannot convert a symbolic Tensor (sequential/lstm/strided_slice:0) to a numpy array. This error may indicate that you're trying to pass a Tensor to a NumPy call, which is not supported
+print(np.__version__)
+
 # part 1: data preprocessing
 # import the training set
 dataset_train = pd.read_csv('Google_Stock_Price_Train.csv')
