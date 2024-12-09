@@ -84,5 +84,9 @@ regressor.add(Dense(units= 1))
 # compile the RNN with optimizer (usually RMSprop, but can also use Adam) and loss function (mean squared error)
 regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
+# fit the RNN to the training set
+# fit requires inputs of the training set, expected output of the training set, number of epochs (play around with the number), and batch size
+regressor.fit(x_train, y_train, epochs = 100, batch_size = 32)
+
 
 # Part 3: making the pedictions and visualizing the results with matplot
