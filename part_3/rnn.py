@@ -5,6 +5,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
+# keras libraries for neural network
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import LSTM
+from keras.layers import Dropout
 
 # part 1: data preprocessing
 # import the training set
@@ -42,11 +47,42 @@ for i in range(60, len(training_set_scaled)):
 # format into arrays
 x_train, y_train = np.array(x_train), np.array(y_train)
 
-# reshaping dimensions to include batch size, time steps (iterations in step above of 60), and number of indicators
+# reshaping dimensions to include batch size, time steps (iterations in step above of 60), and number of indicators (1 since we only have a single stock price. We would have more indicators if we had other variables [i.e: Samsung does business with Google. If we had Samsung's stock that would be a 2nd indicator on Google's stock price])
 # documentation in "sequences" in https://keras.io/api/layers/recurrent_layers/rnn/
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
 # Part 2: build the RNN
+# use Keras libraries
+
+# initialize the RNN
+regressor = Sequential()
+
+# create first LSTM layer
+# LSTM accepts number of units (number of LSTM cells), return sequence (true or false [true when adding new layers to return values]), and input shape (number of iterations and number of indicators)
+regressor.add(LSTM(units = 50, return_sequences= True, input_shape = (x_train.shape[1], 1)))
+
+# add dropout to prevent over fitting to our data set
+# standard practice is to drop 20% of the nodes in the LSTM layer to prevent overfitting
+regressor.add(Dropout(0.2))
+
+
+# repeat by adding a new layer with dropout (no input needed)
+regressor.add(LSTM(units = 50, return_sequences= True))
+regressor.add(Dropout(0.2))
+
+# 3rd layer
+regressor.add(LSTM(units = 50, return_sequences= True))
+regressor.add(Dropout(0.2))
+
+# 4th layer with no return sequence because it is the last layer
+regressor.add(LSTM(units = 50))
+regressor.add(Dropout(0.2))
+
+# output layer. Outputs 1 dimension (stock price) [would be more if there were multiple variables]
+regressor.add(Dense(units= 1))
+
+# compile the RNN with optimizer (usually RMSprop, but can also use Adam) and loss function (mean squared error)
+regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 
 # Part 3: making the pedictions and visualizing the results with matplot
