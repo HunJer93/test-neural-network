@@ -3,6 +3,9 @@
 # import libraries 
 import numpy as np
 import matplotlib.pyplot as plt
+# used to resolve this error: This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+import matplotlib
+matplotlib.use('TKAgg') # used different graphing library to resolve above error ^
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 # keras libraries for neural network
@@ -144,5 +147,16 @@ predicted_stock_price = regressor.predict(x_test)
 # inverse the scaling of the regressor
 predicted_stock_price = sc.inverse_transform(predicted_stock_price)
 
-print(predicted_stock_price)
+
+############################
 # visualize the results
+############################
+
+# create plot
+plt.plot(real_stock_price, color = 'red', label = 'Real Google Stock Price')
+plt.plot(predicted_stock_price, color = 'blue', label = 'Predicted Google Stock Price')
+plt.title('Google Stock Price Prediction')
+plt.xlabel('Time')
+plt.ylabel('Google Stock Price')
+plt.legend()
+plt.show()
