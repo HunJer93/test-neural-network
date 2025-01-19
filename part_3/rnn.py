@@ -16,7 +16,10 @@ from keras.layers import Dropout
 # NotImplementedError: Cannot convert a symbolic Tensor (sequential/lstm/strided_slice:0) to a numpy array. This error may indicate that you're trying to pass a Tensor to a NumPy call, which is not supported
 print(np.__version__)
 
+######################
 # part 1: data preprocessing
+######################
+
 # import the training set
 dataset_train = pd.read_csv('Google_Stock_Price_Train.csv')
 # get the data from the 2nd column (Open column) in an array (: is the range, and 1:2 will select the first column)
@@ -38,6 +41,7 @@ training_set_scaled = sc.fit_transform(training_set)
 # Create a data structure with 60 timesteps and 1 output
 # looks at 60 preivous iterations to make predictions
 # timesteps will need to be fiddled with to get the model fitted right (prevent overfitting or underfitting)
+previous_step_count = 60
 
 # 60 previous stock prices
 x_train = []
@@ -45,7 +49,7 @@ x_train = []
 y_train = []
 
 # iterate starting on 60th iteration and going to end of training set   
-for i in range(60, len(training_set_scaled)):
+for i in range(previous_step_count, len(training_set_scaled)):
     x_train.append(training_set_scaled[i-60:i, 0])
     y_train.append(training_set_scaled[i, 0])
 
@@ -56,7 +60,9 @@ x_train, y_train = np.array(x_train), np.array(y_train)
 # documentation in "sequences" in https://keras.io/api/layers/recurrent_layers/rnn/
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
+###########################
 # Part 2: build the RNN
+###########################
 # use Keras libraries
 
 # initialize the RNN
@@ -93,5 +99,50 @@ regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 # fit requires inputs of the training set, expected output of the training set, number of epochs (play around with the number), and batch size
 regressor.fit(x_train, y_train, epochs = 100, batch_size = 32)
 
-
+######################
 # Part 3: making the pedictions and visualizing the results with matplot
+######################
+
+# get the real stock price from test set
+dataset_test = pd.read_csv('Google_Stock_Price_Test.csv')
+real_stock_price = dataset_train.iloc[:, 1:2].values
+
+# get predicted stock price
+
+# concatenate the training and test set stock price ('Open' is the stock price) to get a new dataframe with both columns
+# using vertical concatenation (axis = 0) vs horizontal concatination (axis = 1) to get the column data instead of the row. 
+dataset_total = pd.concat((dataset_train['Open'], dataset_test['Open']), axis = 0)
+
+# get the upper and lower bounds of the test set.
+# since we are using 60 previous iterations for prediction, we need to offset the data set by 60 days in the beginning to be consistent with the test
+# use .values to get a numpy array
+inputs = dataset_total[len(dataset_total) - len(dataset_test) - 60:].values
+
+# reshape format for Numpy 
+inputs = inputs.reshape(-1,1)
+
+# scale inputs. We ONLY scale inputs and keep test values the same
+inputs = sc.transform(inputs)
+
+# iterate starting on 60th iteration and going to end of training set 
+# upper bound set to 80 (60 previous iterations plus the 20 values in the test set)
+x_test = []
+upper_bound_test = previous_step_count + len(dataset_test)
+
+for i in range(previous_step_count, upper_bound_test):
+    x_test.append(inputs[i-60:i, 0])
+
+# format into array
+x_test = np.array(x_test)
+
+# reshape to 3D format (similar to train)
+x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
+
+# use regressor to predict the results
+predicted_stock_price = regressor.predict(x_test)
+
+# inverse the scaling of the regressor
+predicted_stock_price = sc.inverse_transform(predicted_stock_price)
+
+print(predicted_stock_price)
+# visualize the results
