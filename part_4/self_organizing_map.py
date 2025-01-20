@@ -70,7 +70,7 @@ show()
 
 # find the frauds in the list
 mappings = som.win_map(input_params)
-# frauds need to be pulled from the values that have the Mean Inter-Neuron Distance (MID) at 1
+# frauds need to be pulled from the values that have the Mean Inter-Neuron Distance (MID) at 1 (the white values on the output map)
 frauds = np.concatenate((mappings[(8,1)], mappings[(6,9)]), axis=0)
 frauds = sc.inverse_transform(frauds)
 
