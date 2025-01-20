@@ -35,7 +35,7 @@ from minisom import MiniSom
 # use a 10x10 grid for our smaller data set
 # the input_len is the number of all input and outputs in our dataset
 # learning rate set to default (can beef up to increase accuracy)
-som = MiniSom(x = 10, y = 10, input_len= (len(dataset.columns) - 1), learning_rate= 0.5)
+som = MiniSom(x = 10, y = 10, input_len= (len(dataset.columns) - 1), sigma= 1.0, learning_rate= 0.5)
 # set random starting weights
 som.random_weights_init(input_params)
 
@@ -49,9 +49,31 @@ from pylab import bone, pcolor, colorbar, plot, show
 bone()
 # get the distance map from the self organizing map, and use .T to transpose to 2D grid
 pcolor(som.distance_map().T)
+
 colorbar()
 
-plt.figure(figsize=(10,10))
-plt.pcolor(som.distance_map().T, cmap='gist_yarg')
-plt.colorbar()
-plt.show()
+# add markers to the grid to show which customers are the outliers
+# takes the winning neuron of the row and plots in the center (0.5 added to center the plotted value), and uses the index to link approved/denied value from the output_params
+markers = ['o', 's'] # if fraud, see a red circle; otherwise green square
+colors = ['r', 'g']
+fraud_customers = []
+for index, customer in enumerate(input_params):
+    winning_node = som.winner(customer)
+    plot(winning_node[0] + 0.5,
+         winning_node[1] + 0.5,
+         markers[output_param[index]],
+         markeredgecolor= colors[output_param[index]],
+         markerfacecolor = 'None',
+         markersize = 10,
+         markeredgewidth = 2)
+show()
+
+# find the frauds in the list
+mappings = som.win_map(input_params)
+# frauds need to be pulled from the values that have the Mean Inter-Neuron Distance (MID) at 1
+frauds = np.concatenate((mappings[(8,1)], mappings[(6,9)]), axis=0)
+frauds = sc.inverse_transform(frauds)
+
+
+print(frauds)
+
