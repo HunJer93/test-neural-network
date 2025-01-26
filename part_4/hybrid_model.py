@@ -1,7 +1,7 @@
 # Make a hybrid deep learning model 
 
 # import libraries
-import __main__
+import pdb
 import numpy as np
 import matplotlib.pyplot as plt
 # used this import to solve error with Qt platform plugin not initialized
@@ -21,6 +21,7 @@ class HybridModel:
         self.input_params = []
         self.output_params = []
         self.self_org_map = None
+        self.scaler = None
         
     
     # creates a trained self organizing map for the file type
@@ -36,8 +37,8 @@ class HybridModel:
         self.output_params = dataset.iloc[:, -1].values
 
         # set feature scaling normalized between 0 and 1
-        scaler = MinMaxScaler(feature_range= (0, 1))
-        scaler.fit_transform(self.input_params)
+        self.scaler = MinMaxScaler(feature_range= (0, 1))
+        self.scaler.fit_transform(self.input_params)
 
         # train the self organizing map
         self_org_map = MiniSom(x = 10, y = 10, input_len= (len(dataset.columns) - 1), sigma= 1.0, learning_rate= 0.5)
@@ -77,11 +78,11 @@ class HybridModel:
         sanitized_values = self.clean_input(user_input)
         
         # calculate frauds
-        # self.calculate_frauds()
+        self.calculate_frauds(sanitized_values)
 
     
     # use SOM to find frauds in the dataset
-    def calculate_frauds(self):
+    def calculate_frauds(self, som_coordinates):
         # create SOM if not created yet
         if self.self_org_map is None:
             self.create_som()
@@ -89,16 +90,31 @@ class HybridModel:
         # find the frauds in the list
         mappings = self.self_org_map.win_map(self.input_params)
         # pull frauds using mean inter-neuron distance
+        # get coordinates from input map
+        frauds = []
+        for coordinate in som_coordinates:
+            # left off here! Need to concatenate frauds list at coordinates on the map given
+            # frauds = np.concatenate((mappings[(coordinate[0], coordinate[1])], frauds), axis= 0)   
+            pdb.set_trace() 
+            frauds = np.append(frauds, mappings[(coordinate[0], coordinate[1])])
+            # frauds.append(list(mappings[(coordinate[0], coordinate[1])])) 
+        self.scaler.inverse_transform(frauds)
+            
         
-        # left off here! 
-        # need to work out how to get values out of string for mapping
-        # frauds = np.concatenate((mappings[]))
         
     def clean_input(self, input):
         unsanitized_values = input.split(':')
         unsanitized_values = list(map(lambda value: value.strip(), unsanitized_values))
-        print(unsanitized_values)
+        # created 2D array with coordinates
+        cleaned_values = []
+        for coordinates in unsanitized_values:
+            values = coordinates.split(',')
+            values = map(lambda coordinate: int(coordinate), values)
+            cleaned_values.append(list(values))
+            
+        return cleaned_values        
         
+
 
 
 # Part 1: Identify the Frauds with a Self Organizing Map
