@@ -23,3 +23,10 @@ training_set = pd.read_csv('ml-100k/u1.base', delimiter= '\t')
 training_set = np.array(training_set, dtype= 'int')
 test_set = pd.read_csv('ml-100k/u1.test', delimiter= '\t')
 test_set = np.array(test_set, dtype= 'int')
+
+
+# get the number of users and movies by getting the maximum user id and movie id
+user_column_index = 0
+movie_column_index = 1
+nb_users = int(max(max(training_set[:,user_column_index]), max(test_set[:,user_column_index])))
+nb_movies = int(max(max(training_set[:,movie_column_index]), max(test_set[:,movie_column_index])))
