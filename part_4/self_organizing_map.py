@@ -56,7 +56,6 @@ colorbar()
 # takes the winning neuron of the row and plots in the center (0.5 added to center the plotted value), and uses the index to link approved/denied value from the output_params
 markers = ['o', 's'] # if fraud, see a red circle; otherwise green square
 colors = ['r', 'g']
-fraud_customers = []
 for index, customer in enumerate(input_params):
     winning_node = som.winner(customer)
     plot(winning_node[0] + 0.5,
