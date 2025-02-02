@@ -23,6 +23,3 @@ training_set = pd.read_csv('ml-100k/u1.base', delimiter= '\t')
 training_set = np.array(training_set, dtype= 'int')
 test_set = pd.read_csv('ml-100k/u1.test', delimiter= '\t')
 test_set = np.array(test_set, dtype= 'int')
-
-print(training_set)
-print(test_set)
