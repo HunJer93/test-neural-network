@@ -88,5 +88,17 @@ class RBM():
         
         # return the probability and sampling of probability in our data set using bernoulli's principle for sampling
         return probability_of_hidden_activation, torch.bernoulli(probability_of_hidden_activation)
+ 
+    # create inverse sampling method for visible nodes
+    def sample_v(self, hidden_neurons):
+        # multiply the visible neurons by the current weights (converted to tensors with .t())
+        weight_hidden = torch.mm(hidden_neurons, self.weights)
+        # calculate the activation threshold for like or dislike
+        activation = weight_hidden + self.bias_visible.expand_as(weight_hidden)
+        # use a sigmoid function to create binary output
+        probability_of_visible_activation = torch.sigmoid(activation)
+        
+        # return the probability and sampling of probability in our data set using bernoulli's principle for sampling
+        return probability_of_visible_activation, torch.bernoulli(probability_of_visible_activation)
         
 
