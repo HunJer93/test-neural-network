@@ -107,7 +107,7 @@ class RBM():
     def train(self, v0, vk, ph0, phk):
         # update the weights given sampling
         # weight = (visible vector multiplied by hidden vector activation probability) - (visible sampling vectors multiplied by hidden sampling activation probability) 
-        self.weights += torch.mm(v0.t(), ph0) - torch.mm(vk.t(), phk)
+        self.weights += torch.mm(v0.t(), ph0).t() - torch.mm(vk.t(), phk).t()
         
         # update the visible bias
         # v_bias = visible vector minus by the sampling
