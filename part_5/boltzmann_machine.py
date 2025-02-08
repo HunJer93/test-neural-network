@@ -74,5 +74,19 @@ class RBM():
         self.weights = torch.randn(nh, nv) # initalized the random weights for nodes
         self.bias_hidden = torch.randn(1, nh) # added 1 to bias to created a 2D tensor
         self.bias_visible = torch.randn(1, nv) # added 1 to bias to created a 2D tensor
+    
+    # method used to sample the hidden nodes in the network
+    # and figure out the probability that the hidden node is activated
+    # based on what we can see in the visible node
+    def sample_h(self, visible_neurons):
+        # multiply the visible neurons by the current weights (converted to tensors with .t())
+        weight_visible = torch.mm(visible_neurons, self.weights.t())
+        # calculate the activation threshold for like or dislike
+        activation = weight_visible + self.bias_hidden.expand_as(weight_visible)
+        # use a sigmoid function to create binary output
+        probability_of_hidden_activation = torch.sigmoid(activation)
+        
+        # return the probability and sampling of probability in our data set using bernoulli's principle for sampling
+        return probability_of_hidden_activation, torch.bernoulli(probability_of_hidden_activation)
         
 
