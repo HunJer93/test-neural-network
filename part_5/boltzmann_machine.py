@@ -65,7 +65,6 @@ test_set[test_set == 1 ] = 0
 test_set[test_set == 2 ] = 0
 test_set[test_set >= 3] = 1
 
-
 # create the architecture of the neural network
 class RBM():
     
@@ -119,3 +118,9 @@ class RBM():
         self.bias_hidden += torch.sum((ph0 - phk), 0)
         
 
+# get the number of visible nodes, hidden nodes, and batch size (can play around with the hidden node and batch size)
+nodes_visible = len(training_set[0])
+nodes_hidden = 100
+batch_size = 100
+
+rbm = RBM(nodes_visible, nodes_hidden)
