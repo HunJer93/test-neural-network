@@ -47,3 +47,9 @@ def convert(data):
 
 training_set = convert(training_set)
 test_set = convert(test_set)
+
+# convert the data into Torch tensors
+# torch FloatTensor only accepts a list of lists
+training_set = torch.FloatTensor(training_set)
+test_set = torch.FloatTensor(test_set)
+
