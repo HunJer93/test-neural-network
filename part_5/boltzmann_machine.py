@@ -117,10 +117,44 @@ class RBM():
         # h_bias = hidden vector activation probability minus probability hidden after k sampling
         self.bias_hidden += torch.sum((ph0 - phk), 0)
         
-
 # get the number of visible nodes, hidden nodes, and batch size (can play around with the hidden node and batch size)
 nodes_visible = len(training_set[0])
 nodes_hidden = 100
 batch_size = 100
 
+print('visible: ' + str(nodes_visible) + ' hidden: ' + str(nodes_hidden))
 rbm = RBM(nodes_visible, nodes_hidden)
+
+# training the RBM
+nb_epoch = 10
+for epoch in range(1, nb_epoch + 1):
+    # calculate the loss in each epoch
+    train_loss = 0
+    s = 0.
+    # iterate through users in batches
+    for id_user in range(0, nb_users - batch_size, batch_size):
+        # vk = sampling batch (we will update this as we go)
+        # start at the user id and get the batch size from the training set (returns 100 users)
+        vk = training_set[id_user:id_user + batch_size]
+        v0 = training_set[id_user:id_user + batch_size]
+        # create probability of hidden nodes from the visible nodes sampled
+        ph0,_ = rbm.sample_h(v0)
+        
+        # use Gibbs sampling (k random walk)
+        for k in range(10):
+            # sample back and forth between visible and hidden nodes, updating the sampled probability through each iteration
+            _,hk = rbm.sample_h(vk)
+            _,vk = rbm.sample_v(hk)
+            # freeze the -1 ratings so that they aren't updated in Gibbs sampling
+            vk[v0 < 0] = v0[v0 < 0]
+        # get the probability of hidden activation from sampling
+        phk,_ = rbm.sample_h(vk)
+        # run the training with values created
+        rbm.train(v0, vk, ph0, phk)
+        
+        # calculate the loss by getting the average distance between the first vector and sampled vector for relevant ratings (excluding -1 values that indicate no rating given)
+        train_loss += torch.mean(torch.abs(v0[v0 >= 0] - vk[v0 >= 0]))
+        # increment the counter
+        s += 1.
+    print('epoch: ' + str(epoch)+ ' loss: ' + str(train_loss/s))
+            
