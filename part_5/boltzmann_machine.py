@@ -100,5 +100,22 @@ class RBM():
         
         # return the probability and sampling of probability in our data set using bernoulli's principle for sampling
         return probability_of_visible_activation, torch.bernoulli(probability_of_visible_activation)
+    
+    # v0 = input vector
+    # vk = visible nodes after k sampling
+    # ph0 = vector probability that hidden nodes are activated (node = 1) given the input vector
+    # phk = probability of hidden nodes after k sampling given values of visible node sampling (vk)
+    def train(self, v0, vk, ph0, phk):
+        # update the weights given sampling
+        # weight = (visible vector multiplied by hidden vector activation probability) - (visible sampling vectors multiplied by hidden sampling activation probability) 
+        self.weights += torch.mm(v0.t(), ph0) - torch.mm(vk.t(), phk)
+        
+        # update the visible bias
+        # v_bias = visible vector minus by the sampling
+        self.bias_visible += torch.sum((v0 - vk), 0)
+        
+        # update the visible bias
+        # h_bias = hidden vector activation probability minus probability hidden after k sampling
+        self.bias_hidden += torch.sum((ph0 - phk), 0)
         
 
