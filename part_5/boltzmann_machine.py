@@ -66,3 +66,13 @@ test_set[test_set == 2 ] = 0
 test_set[test_set >= 3] = 1
 
 
+# create the architecture of the neural network
+class RBM():
+    
+    # nv is visible nodes and nh is the hidden nodes
+    def __init__(self, nv, nh):
+        self.weights = torch.randn(nh, nv) # initalized the random weights for nodes
+        self.bias_hidden = torch.randn(1, nh) # added 1 to bias to created a 2D tensor
+        self.bias_visible = torch.randn(1, nv) # added 1 to bias to created a 2D tensor
+        
+
