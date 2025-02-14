@@ -138,6 +138,7 @@ for epoch in range(1, nb_epoch + 1):
         vk = training_set[id_user:id_user + batch_size]
         v0 = training_set[id_user:id_user + batch_size]
         # create probability of hidden nodes from the visible nodes sampled
+        # used to create the 'random walk' (Monte Carlo Markov Chain (MCMC))
         ph0,_ = rbm.sample_h(v0)
         
         # use Gibbs sampling (k random walk)
@@ -161,15 +162,28 @@ for epoch in range(1, nb_epoch + 1):
     
     
     
-    # test the RBM
+# test the RBM
+
+
 test_loss = 0
 s = 0.
+# run the model on each of the users in the test set
 for id_user in range(nb_users):
-    v = training_set[id_user:id_user+1]
-    vt = test_set[id_user:id_user+1]
-    if len(vt[vt>=0]) > 0:
-        _,h = rbm.sample_h(v)
-        _,v = rbm.sample_v(h)
-        test_loss += torch.mean(torch.abs(vt[vt>=0] - v[vt>=0]))
+    # use the training set inputs to activate the hidden neruons in the network
+    # this is then used to predict the outcome of the target 'test set'
+    visible_nodes = training_set[id_user:id_user+1]
+    input_target = test_set[id_user:id_user+1]
+    # no for loop because we only walk to iterate through the test set once
+    # only walk through the values in the test set once due to MCMC training that occured in training (this is called the 'blind walk')
+    # 'we were trained to walk 100 steps blindfolded, so it is more accurate to walk one step blindfolded to prevent diviation"
+    
+    # using this if block to filter out the -1 values that represented no user feedback
+    if len(input_target[input_target>=0]) > 0:
+        # use Gibbs sampling to get a hidden node and a visible node
+        _,hidden_nodes = rbm.sample_h(visible_nodes)
+        _,visible_nodes = rbm.sample_v(hidden_nodes)
+        test_loss += torch.mean(torch.abs(input_target[input_target>=0] - visible_nodes[input_target>=0]))
         s += 1. 
+# get the average loss of the loss divided by the number of iterations
+# the loss determines how often the model is wrong so .25 outcome is correct at predicting 3 out of 4 times. 
 print('test loss: '+str(test_loss/s))
