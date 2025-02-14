@@ -164,7 +164,6 @@ for epoch in range(1, nb_epoch + 1):
     
 # test the RBM
 
-
 test_loss = 0
 s = 0.
 # run the model on each of the users in the test set
@@ -182,8 +181,14 @@ for id_user in range(nb_users):
         # use Gibbs sampling to get a hidden node and a visible node
         _,hidden_nodes = rbm.sample_h(visible_nodes)
         _,visible_nodes = rbm.sample_v(hidden_nodes)
+        # used average distance to calculate the loss instead of Root Mean Squared Error (RMSE)
+        # RMSE would have been: 
+        # test_loss += np.sqrt(torch.mean(input_target[input_target>=0] - visible_nodes[input_target>=0]**2))
         test_loss += torch.mean(torch.abs(input_target[input_target>=0] - visible_nodes[input_target>=0]))
         s += 1. 
 # get the average loss of the loss divided by the number of iterations
 # the loss determines how often the model is wrong so .25 outcome is correct at predicting 3 out of 4 times. 
 print('test loss: '+str(test_loss/s))
+
+# once the RBM is trained, we can tie this logic into an auto-encoder to create recommendations
+# auto encoders are in the next part!
