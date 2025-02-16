@@ -82,3 +82,26 @@ criterion = nn.MSELoss()
 # create the optimizer with all the values of the auto encoder, the learning rate (try other numbers), and the weight decay (used to regulate the convergence)
 optimizer = optim.RMSprop(sae.parameters(), lr = 0.01, weight_decay = 0.5)
 
+
+# train the stacked auto encoder
+
+# define the number of epochs
+nb_epochs = 200
+
+# loop through each epoch
+for epoch in range(1, nb_epochs + 1):
+    # create the train loss to calculate loss through each epoch
+    train_loss = 0
+    # count number of users that rated a movie. Created as a float because the root mean squared error (RMSE) is calculated as a float
+    s = 0.
+    # loop through all of the users that rated a movie
+    for id_user in range(nb_users):
+        # get the inputs (ratings) of the user from the training set
+        # use Variable().unsqueeze(0) to format the data set (array) into a torch tensor (a batch of arrays)
+        input = Variable(training_set[id_user]).unsqueeze(0)
+        # get the original input before we manipulate the data
+        target = input.clone()
+        # filter out users that didn't rate any movies for efficiency
+        if torch.sum(target.data > 0) > 0:
+            # get the output of predicted ratings using the stacked auto encoder, and the user's ratings (input)
+            output = sae(input)
