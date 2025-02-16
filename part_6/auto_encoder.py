@@ -50,7 +50,7 @@ test_set = convert(test_set)
 training_set = torch.FloatTensor(training_set)
 test_set = torch.FloatTensor(test_set)
 
-# create architecture of the neural network
+# create architecture of the stacked auto encoder
 class SAE(nn.Module):
     
     def __init__(self, ):
@@ -67,7 +67,18 @@ class SAE(nn.Module):
         # using Sigmoid vs. Rectifier, but try with both!
         self.activation = nn.Sigmoid()
     
-    
+    # method to run an input through the encoding/decoding layers of the auto encoder
+    def forward(self, input_vector):
+        input_vector = self.activation(self.fc1(input_vector))
+        input_vector = self.activation(self.fc2(input_vector))
+        input_vector = self.activation(self.fc3(input_vector))
+        input_vector = self.fc4(input_vector)
+        return input_vector
 
+# call the auto encoder    
+sae = SAE()
+# calculate the error with mean square error loss 
+criterion = nn.MSELoss()
+# create the optimizer with all the values of the auto encoder, the learning rate (try other numbers), and the weight decay (used to regulate the convergence)
+optimizer = optim.RMSprop(sae.parameters(), lr = 0.01, weight_decay = 0.5)
 
-        
