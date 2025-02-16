@@ -116,11 +116,12 @@ for epoch in range(1, nb_epochs + 1):
             mean_corrector = nb_movies/float(torch.sum(target.data > 0) + 1e-10)
             # call backward method for the loss to indicate if we need to increase/decrease the weights
             loss.backward()
-            # update the training loss with the difference between the real/predicted rating (calculating the RMSE) by unpacking the 'error' in the loss object (located at index 0 in the object)
-            train_loss += np.sqrt(loss.data[0]*mean_corrector)
+            # update the training loss with the difference between the real/predicted rating (calculating the RMSE)
+            train_loss += np.sqrt(loss.item()*mean_corrector)
             # increment the number of users that rating a movie
             s += 1.
             # apply the optimizer to update the weights after the RMSE has been applied to the loss
             optimizer.step()
     # output the average training loss for each epoch (train loss divided by the number of computations (users who rated a movie))
+    # the difference of 1 in the average loss means that we are off by 1 star out of 5 for our ratings (lower the more accurate we are)
     print('epoch: ' + str(epoch) + ' loss: ' + str(train_loss/s))
