@@ -125,3 +125,39 @@ for epoch in range(1, nb_epochs + 1):
     # output the average training loss for each epoch (train loss divided by the number of computations (users who rated a movie))
     # the difference of 1 in the average loss means that we are off by 1 star out of 5 for our ratings (lower the more accurate we are)
     print('epoch: ' + str(epoch) + ' loss: ' + str(train_loss/s))
+    
+# testing the stacked autoencoder
+
+# similar logic to training, but no back propagation (remove back poropagation and optimizer logic)
+    test_loss = 0
+    s = 0.
+
+for id_user in range(nb_users):
+    # get the input from the TRAINING SET so that we can predict what the user might like in the test set.
+    input = Variable(training_set[id_user]).unsqueeze(0)
+    # this time, use the test set data as the target
+    target = Variable(test_set[id_user]).unsqueeze(0)
+    # filter out users that didn't rate any movies for efficiency
+    if torch.sum(target.data > 0) > 0:
+        # use the training set to predict output
+        output = sae(input)
+        # use .requires_grad = False to apply stochastic gradient descent to the input and not the target (used because this is a shallow clone of the input variable)
+        target.requires_grad = False
+        # filter out non-zero values from output for optimization
+        output[target == 0] = 0
+        # calculate the loss error using vector of target vs real ratings (prediction vs. truth)
+        loss = criterion(output, target)
+        # create mean corrector to calculate the mean of all movies rated and not rated 
+        # use 1 ^-10 (1e-10) to make the output a real number and to prevent computations that result in infinity
+        mean_corrector = nb_movies/float(torch.sum(target.data > 0) + 1e-10)
+        
+        # no back propagation because we are not training
+
+        # update the test loss with the difference between the real/predicted rating (calculating the RMSE)
+        test_loss += np.sqrt(loss.item()*mean_corrector)
+        # increment the number of users that rating a movie
+        s += 1.
+
+# output the average test loss for each epoch
+# the difference of 1 in the average loss means that we are off by 1 star out of 5 for our ratings (lower the more accurate we are)
+print('test loss: ' + str(test_loss/s))
